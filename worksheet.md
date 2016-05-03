@@ -8,6 +8,13 @@ Before you begin, you'll need to load up R, point it at the directory where you 
 library(Biostrings)
 ~~~
 
+If this doesn't work, you might need to install Biostrings, via the [Bioconductor installer](http://bioconductor.org/install/):
+
+~~~.R
+source("https://bioconductor.org/biocLite.R")
+biocLite("Biostrings")
+~~~
+
 ### 1: Create a DNAString object in R to hold the following DNA string:
 
 ~~~
