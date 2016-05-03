@@ -11,7 +11,7 @@ library(Biostrings)
 If this doesn't work, you might need to install Biostrings, via the [Bioconductor installer](http://bioconductor.org/install/):
 
 ~~~.R
-source("https://bioconductor.org/biocLite.R")
+source("http://bioconductor.org/biocLite.R")
 biocLite("Biostrings")
 ~~~
 
