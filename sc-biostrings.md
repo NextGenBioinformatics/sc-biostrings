@@ -177,7 +177,7 @@ As we can see, there are 336,409 instances of the exact sequence `TATA` on chr17
 
 The alphabet frequency across DNA sequences is a common problem. Biostrings makes this easy. We can see the distribution of nucleotides very easily:
 
-~~~R
+~~~ RMarkdown
 > alphabetFrequency(chr17)
        A        C        G        T        M        R        W        S        Y        K 
 22639499 18723944 18851500 22705261        0        0        0        0        0        0 
