@@ -1,47 +1,120 @@
-# Biostrings Workshop
+# Software Carpentry Biostrings Workshop
 
-All of the questions below can be answered using the code we worked through last week. Have a go, and if you get stuck peek at the `biostrings-demonstration.R` file in this repository.
+This set of examples demonstrates some of the functionality that the [Biostrings](https://bioconductor.org/packages/release/bioc/html/Biostrings.html) package (part of the [Bioconductor](https://bioconductor.org) project) adds to R. We will work through some fundamental manipulations of nucleotide data.
 
-Before you begin, you'll need to load up R, point it at the directory where you have downloaded these files, and load the Biostrings library:
+## Install And Load the Biostrings Package
 
-~~~.R
+Before we begin, we might have to install the Biostrings library. We can check if it is installed by attempting to load it:
+
+~~~R
 library(Biostrings)
 ~~~
 
-If this doesn't work, you might need to install Biostrings, via the [Bioconductor installer](http://bioconductor.org/install/):
+If the library is installed, you'll get lots of messages on the screen. However, if the library is **not** installed, you'll get an error message:
 
-~~~.R
+~~~
+Error in library(Biostrings) : there is no package called ‘Biostrings’
+~~~
+
+In this case, we need to install it from Bioconductor, using the .[Bioconductor installer](http://bioconductor.org/install/):
+
+~~~R
 source("http://bioconductor.org/biocLite.R")
 biocLite("Biostrings")
 ~~~
 
-### 1: Create a DNAString object in R to hold the following DNA string:
+Remember that installing the package is very different to loading it. So, once we've installed it, we still need to load it:
 
+~~~R
+library(Biostrings)
 ~~~
-TTGGGTAGGGGAGAAGAATTTTGGGGCGATGAAACTCTATGAAAAGTTTGGGTTTGTACCAGTTGGTAAG
+
+## Read In Nucleotide Data
+
+There are several ways of getting nucleotide data into R. The most simple is to type (or copy & paste) it in. For example, the first 50 nucleotides from the human TP53 gene can be loaded into R as:
+
+~~~R
+s <- DNAString("GAGACAGAGTCTCACTCTGTTGCACAGGCTGGAGTGCAGTGGCACAATCT")
 ~~~
 
-###2: What is the letter frequency of the string?
+Once we've loaded this, we can examine it. Running `print(s)`, shows us a representation of the object itself:
 
-You should be able to use a single command to get the frequency of A, T, G, and C in the string.
+~~~R
+> print(s)
+  50-letter "DNAString" instance
+seq: GAGACAGAGTCTCACTCTGTTGCACAGGCTGGAGTGCAGTGGCACAATCT
+~~~
 
-### 3: How many GA pairs are present in the string?
-Use a very similar command to the answer to question 2.
+Although OK for short sequences, we often will need to load sequences from file. Reading a FASTA file is easy. For example, the file `TP53-exons.fasta` contains the exons from the TP53 transcript [TP53-222](http://www.ensembl.org/Homo_sapiens/Transcript/Summary?db=core;g=ENSG00000141510;r=17:7661779-7687550;t=ENST00000617185) (ENST00000617185.4). As this file contains 12 exons with a total length of 2,724 nucleotides, we don't want to type it in! We can load the FASTA file with:
 
-### 4: What is the GC content of the string?
-This is (again) very similar to the last two questions, but involves two steps.
+~~~R
+TP53.222 <- readDNAStringSet("TP53-exons.fasta")
+~~~
 
-### 5: Read in the first sequence in the "mystery.fasta" file.
-Remember that we only want **one** sequence back, and that reading in a FASTA file will give us a set of sequences.
+When we examine the object we loaded, we see something a bit different to before:
 
-### 6: How long is the sequence?
+~~~R
+> print(TP53.222)
+  A DNAStringSet instance of length 12
+     width seq                                                                              names               
+ [1]   174 GATGGGATTGGGGTTTTCCCCTCCCATGTGCTCAAGACT...CGTGCTTTCCACGACGGTGACACGCTTCCCTGGATTGG ENST00000617185 E...
+ [2]   102 CAGCCAGACTGCCTTCCGGGTCACTGCCATGGAGGAGCC...CCTCTGAGTCAGGAAACATTTTCAGACCTATGGAAACT ENST00000617185 E...
+ [3]    22 ACTTCCTGAAAACAACGTTCTG                                                           ENST00000617185 E...
+ [4]   279 TCCCCCTTGCCGTCCCAAGCAATGGATGATTTGATGCTG...TCTTGCATTCTGGGACAGCCAAGTCTGTGACTTGCACG ENST00000617185 E...
+ [5]   184 TACTCCCCTGCCCTCAACAAGATGTTTTGCCAACTGGCC...GCGCTGCCCCCACCATGAGCGCTGCTCAGATAGCGATG ENST00000617185 E...
+ ...   ... ...
+ [8]   137 TGGTAATCTACTGGGACGGAACAGCTTTGAGGTGCGTGT...GCCTCACCACGAGCTGCCCCCAGGGAGCACTAAGCGAG ENST00000617185 E...
+ [9]    74 CACTGCCCAACAACACCAGCTCCTCTCCCCAGCCAAAGAAGAAACCACTGGATGGAGAATATTTCACCCTTCAG       ENST00000617185 E...
+[10]   133 GACCAGACCAGCTTTCAAAAAGAAAATTGTTAAAGAGAG...GTTACTTCCTGATAAACTCGTCGTAAGTTGAAAATATT ENST00000617185 E...
+[11]   107 ATCCGTGGGCGTGAGCGCTTCGAGATGTTCCGAGAGCTG...GCTGGGAAGGAGCCAGGGGGGAGCAGGGCTCACTCCAG ENST00000617185 E...
+[12]  1289 CCACCTGAAGTCCAAAAAGGGTCAGTCTACCTCCCGCCA...CAATAAAACTTTGCTGCCACCTGTGTGTCTGAGGGGTG ENST00000617185 E...
+~~~
 
-### 7: Is the string you found above present in the sequence?  If so, where?
+There are several things to note here:
 
-### 8: What is the overall GC content of the loaded sequence?
-See above!
+1. We've loaded 12 DNA sequences, not one;
+2. We have a `DNAStringSet` object (not a `DNAString`);
+3. Each sequence has a different length; and
+4. Each sequence has a name
 
-### 9: Plot the GC content of the sequence across a sliding window
-This is a bit more tricky...
+We can get the *width* of each sequence:
 
-### 10: Take a guess as to which organism this sequence might be from.
+~~~R
+> width(TP53.222)
+ [1]  174  102   22  279  184  113  110  137   74  133  107 1289
+~~~
+
+Similarly, we can get the sequence names:
+
+~~~R
+> names(TP53.222)
+ [1] "ENST00000617185 ENSE00003753508 exon:protein_coding" "ENST00000617185 ENSE00002667911 exon:protein_coding"
+ [3] "ENST00000617185 ENSE00002419584 exon:protein_coding" "ENST00000617185 ENSE00003625790 exon:protein_coding"
+ [5] "ENST00000617185 ENSE00003518480 exon:protein_coding" "ENST00000617185 ENSE00003723991 exon:protein_coding"
+ [7] "ENST00000617185 ENSE00003712342 exon:protein_coding" "ENST00000617185 ENSE00003725258 exon:protein_coding"
+ [9] "ENST00000617185 ENSE00003786593 exon:protein_coding" "ENST00000617185 ENSE00003735852 exon:protein_coding"
+[11] "ENST00000617185 ENSE00003634848 exon:protein_coding" "ENST00000617185 ENSE00003492844 exon:protein_coding"
+~~~
+
+We can extract a single DNA sequence from the set using square brackets:
+
+~~~R
+> TP53.222[1]
+  A DNAStringSet instance of length 1
+    width seq                                                                               names               
+[1]   174 GATGGGATTGGGGTTTTCCCCTCCCATGTGCTCAAGACT...GCGTGCTTTCCACGACGGTGACACGCTTCCCTGGATTGG ENST00000617185 E...
+~~~
+
+What has this given us back? A `DNAStringSet` containing a single sequence. This might not be what we wanted; we might want a single `DNAString`. We can get this using the double-square-bracket syntax:
+
+~~~R
+> TP53.222[[1]]
+  174-letter "DNAString" instance
+seq: GATGGGATTGGGGTTTTCCCCTCCCATGTGCTCAAGACTGGCGCTAAAAGTT...GTTCGGGCTGGGAGCGTGCTTTCCACGACGGTGACACGCTTCCCTGGATTGG
+~~~
+
+We 
+
+## Extract Subsequences
+
+
