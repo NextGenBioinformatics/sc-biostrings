@@ -6,26 +6,26 @@ This set of examples demonstrates some of the functionality that the [Biostrings
 
 Before we begin, we might have to install the Biostrings library. We can check if it is installed by attempting to load it:
 
-~~~RMarkdown
+~~~R
 library(Biostrings)
 ~~~
 
 If the library is installed, you'll get lots of messages on the screen. However, if the library is **not** installed, you'll get an error message:
 
-~~~RMarkdown
+~~~R
 Error in library(Biostrings) : there is no package called ‘Biostrings’
 ~~~
 
 In this case, we need to install it from Bioconductor, using the .[Bioconductor installer](http://bioconductor.org/install/):
 
-~~~RMarkdown
+~~~R
 source("http://bioconductor.org/biocLite.R")
 biocLite("Biostrings")
 ~~~
 
 Remember that installing the package is very different to loading it. So, once we've installed it, we still need to load it:
 
-~~~RMarkdown
+~~~R
 library(Biostrings)
 ~~~
 
@@ -33,13 +33,13 @@ library(Biostrings)
 
 There are several ways of getting nucleotide data into R. The most simple is to type (or copy & paste) it in. For example, the first 50 nucleotides from the human TP35 gene are:
 
-~~~RMarkdown
+~~~R
 s <- DNAString("GAGACAGAGTCTCACTCTGTTGCACAGGCTGGAGTGCAGTGGCACAATCT")
 ~~~
 
 Once we've loaded this, we can examine it. Running `print(s)`, shows us a representation of the object itself:
 
-~~~RMarkdown
+~~~R
 > print(s)
   50-letter "DNAString" instance
 seq: GAGACAGAGTCTCACTCTGTTGCACAGGCTGGAGTGCAGTGGCACAATCT
@@ -47,13 +47,13 @@ seq: GAGACAGAGTCTCACTCTGTTGCACAGGCTGGAGTGCAGTGGCACAATCT
 
 Although OK for short sequences, we often will need to load sequences from file. Reading a FASTA file is easy. For example, the file `rRNA.fasta` contains the sequences of all rRNA segences in the human genome. As this file contains 569 genes with a total length of 65,057 nucleotides, we don't want to type it in! We can load the FASTA directly from the GitHub page for this tutorial file with:
 
-~~~RMarkdown
+~~~R
 rRNA <- readDNAStringSet("https://raw.githubusercontent.com/alastair-droop/sc-biostrings/master/data/rRNA.fasta")
 ~~~
 
 When we examine the object we loaded, we see something a bit different to before:
 
-~~~RMarkdown
+~~~R
 > print(rRNA)
   A DNAStringSet instance of length 569
       width seq                                                               names               
@@ -79,7 +79,7 @@ There are several things to note here:
 
 We can get the *width* of each sequence:
 
-~~~RMarkdown
+~~~R
 > width(rRNA)
   [1] 120 119 118 115 119 117 125 119 155 119 110 114 119 119 111 152 119  94 117 117 119 118 152
  [24] 118 120 117 119 109 113 119 115 119 119 126 119 111 121 100 113 110 116 111 115 119 119 120
@@ -89,7 +89,7 @@ We can get the *width* of each sequence:
 
 Similarly, we can get the sequence names:
 
-~~~RMarkdown
+~~~R
 > names(rRNA)
   [1] "ENSG00000200516|ENST00000363646" "ENSG00000199334|ENST00000362464"
   [3] "ENSG00000199806|ENST00000362936" "ENSG00000199508|ENST00000362638"
@@ -99,7 +99,7 @@ Similarly, we can get the sequence names:
 
 We can extract a single DNA sequence from the set using square brackets:
 
-~~~RMarkdown
+~~~R
 > rRNA[1]
   A DNAStringSet instance of length 1
     width seq                                                                 names               
@@ -108,7 +108,7 @@ We can extract a single DNA sequence from the set using square brackets:
 
 What has this given us back? A `DNAStringSet` containing a single sequence. This might not be what we wanted; we might want a single `DNAString`. We can get this using the double-square-bracket syntax:
 
-~~~RMarkdown
+~~~R
 > rRNA[[1]]
   120-letter "DNAString" instance
 seq: AAACACGAACAGCCATGCCTGAACGGGCCCGGTTGCATCTGATTG...TACTTGGATGGGAGACCAACTGGGAGTATCAGGTGCTCGAGGCTT
@@ -116,7 +116,7 @@ seq: AAACACGAACAGCCATGCCTGAACGGGCCCGGTTGCATCTGATTG...TACTTGGATGGGAGACCAACTGGGAGT
 
 Often, we know that out FASTA files contain only a single sequence, so we can read the file in and extract the first (and only) sequence from it in one line. We will now use this to download the human genome sequence for chromosome 17:
 
-~~~RMarkdown
+~~~R
 > chr17 <- readDNAStringSet("https://raw.githubusercontent.com/alastair-droop/sc-biostrings/master/data/chr17.fasta.gz")[[1]]
 trying URL 'https://raw.githubusercontent.com/alastair-droop/sc-biostrings/master/data/chr17.fasta.gz'
 Content type 'application/octet-stream' length 23708649 bytes (22.6 MB)
@@ -132,19 +132,19 @@ seq: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNNN
 
 Once we have a sequence, we often want to identify multiple parts of it which might be of interest. For example, now that we have the genome sequence of chr17, we can extract all of the gene sequences. However, we need to know the regions we want to get back. We can get the start and end positions of all genes on chr17 from the GitHub project:
 
-~~~RMarkdown
+~~~R
 chr17.genepos <- read.csv("https://raw.githubusercontent.com/alastair-droop/sc-biostrings/master/data/chr17-genes.csv", row.names=1)
 ~~~
 
 This gives us a `data.frame` with three columns: name, start and end. We can use the start and end positions to pull out the gene sequences for these 3,014 genes.
 
-~~~RMarkdown
+~~~R
 chr17.genes <- Views(chr17, start=chr17.genepos$start, end=chr17.genepos$end, names= chr17.genepos$name)
 ~~~
 
 We now have a set of sequences from chr17 that correspond to the genes. We can now extract a specific gene by its name. For example, to pull out the sequence of TP53:
 
-~~~RMarkdown
+~~~R
 > chr17.genes[['TP53']]
   25772-letter "DNAString" instance
 seq: GAGACAGAGTCTCACTCTGTTGCACAGGCTGGAGTGCAGTGGCAC...AGCGCCAGTCTTGAGCACATGGGAGGGGAAAACCCCAATCCCATC
@@ -152,7 +152,7 @@ seq: GAGACAGAGTCTCACTCTGTTGCACAGGCTGGAGTGCAGTGGCAC...AGCGCCAGTCTTGAGCACATGGGAGGG
 
 We can search for small sequences across our whole chromosome. For example, we can find the positions of all the `TATA` sequences:
 
-~~~RMarkdown
+~~~R
 > matchPattern('TATA', chr17)
   Views on a 83257441-letter DNAString subject
 subject: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
@@ -177,7 +177,7 @@ As we can see, there are 336,409 instances of the exact sequence `TATA` on chr17
 
 The alphabet frequency across DNA sequences is a common problem. Biostrings makes this easy. We can see the distribution of nucleotides very easily:
 
-~~~RMarkdown
+~~~R
 > alphabetFrequency(chr17)
        A        C        G        T        M        R        W        S        Y        K 
 22639499 18723944 18851500 22705261        0        0        0        0        0        0 
@@ -189,7 +189,7 @@ We can see that there are many A, C, G, and T nucleotides, but also many N's.
 
 We can look at the overall GC content similarly:
 
-~~~RMarkdown
+~~~R
 > letterFrequency(chr17, letters='GC', as.prob=TRUE)
       G|C 
 0.4513163 
@@ -197,7 +197,7 @@ We can look at the overall GC content similarly:
 
 Compare this to the genes:
 
-~~~RMarkdown
+~~~R
 > mean(letterFrequency(chr17.genes, letters='GC', as.prob=TRUE)[,1])
 [1] 0.497416
 ~~~
